@@ -3,9 +3,7 @@ name: Build Gradle
 on:
   push:
     branches:
-      - main
-      - staging
-      - release/*
+      - '**'
   workflow_dispatch:
 
 jobs:

@@ -6,6 +6,7 @@ import dev.mizarc.waystonewarps.application.actions.world.GetWarpAtPosition
 import dev.mizarc.waystonewarps.application.actions.world.IsValidWarpBase
 import dev.mizarc.waystonewarps.application.services.ConfigService
 import dev.mizarc.waystonewarps.infrastructure.mappers.toPosition3D
+import dev.mizarc.waystonewarps.infrastructure.services.DominionCompat
 import dev.mizarc.waystonewarps.infrastructure.services.WorldGuardCompat
 import dev.mizarc.waystonewarps.interaction.localization.LocalizationKeys
 import dev.mizarc.waystonewarps.interaction.localization.LocalizationProvider
@@ -62,6 +63,10 @@ class WaystoneInteractListener(private val configService: ConfigService): Listen
 
         // Create new warp if not found, open management menu if owner, discover otherwise
         warp?.let {
+            if (!DominionCompat.canInteract(player, clickedBlock.location)) {
+                return
+            }
+
             if (!WorldGuardCompat.canInteract(player, clickedBlock.location)) {
                 return
             }

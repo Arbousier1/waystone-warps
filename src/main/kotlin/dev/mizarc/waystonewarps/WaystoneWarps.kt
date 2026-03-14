@@ -135,6 +135,7 @@ class WaystoneWarps: JavaPlugin() {
         initialiseLang()
         registerDependencies()
         registerCommands()
+        DominionCompat.registerFlag(this)
         registerEvents()
         AddAllDisplays(warpRepository, structureBuilderService, hologramService).execute()
 

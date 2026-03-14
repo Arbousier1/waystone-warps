@@ -2,6 +2,8 @@ name: WaystoneWarps
 version: 1.0.0
 api-version: '1.21'
 main: dev.mizarc.waystonewarps.WaystoneWarps
+softdepend:
+  - WorldGuard
 libraries:
   - org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0
   - org.jetbrains.kotlin:kotlin-stdlib:2.3.0

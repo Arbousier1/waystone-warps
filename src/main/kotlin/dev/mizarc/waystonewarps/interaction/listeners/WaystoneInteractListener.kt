@@ -6,6 +6,7 @@ import dev.mizarc.waystonewarps.application.actions.world.GetWarpAtPosition
 import dev.mizarc.waystonewarps.application.actions.world.IsValidWarpBase
 import dev.mizarc.waystonewarps.application.services.ConfigService
 import dev.mizarc.waystonewarps.infrastructure.mappers.toPosition3D
+import dev.mizarc.waystonewarps.infrastructure.services.WorldGuardCompat
 import dev.mizarc.waystonewarps.interaction.localization.LocalizationKeys
 import dev.mizarc.waystonewarps.interaction.localization.LocalizationProvider
 import dev.mizarc.waystonewarps.interaction.menus.MenuNavigator
@@ -23,6 +24,7 @@ import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
+import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -43,7 +45,7 @@ class WaystoneInteractListener(private val configService: ConfigService): Listen
 
     private val openOtherMenuPermission = "waystonewarps.bypass.open_menu"
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     fun onLodestoneInteract(event: PlayerInteractEvent) {
         val player: Player = event.player
         if (event.action != Action.RIGHT_CLICK_BLOCK) return
@@ -60,9 +62,15 @@ class WaystoneInteractListener(private val configService: ConfigService): Listen
 
         // Create new warp if not found, open management menu if owner, discover otherwise
         warp?.let {
+            if (!WorldGuardCompat.canInteract(player, clickedBlock.location)) {
+                return
+            }
+
+            event.useInteractedBlock = Event.Result.DENY
+            event.useItemInHand = Event.Result.DENY
+
             // Check if warp is locked and alert if no access
             player.swingMainHand()
-            event.isCancelled = true
             val isOwner = warp.playerId == player.uniqueId
             val canOpenOtherMenu = player.hasPermission(openOtherMenuPermission)
             val isAdminMenuOpenAttempt = !isOwner && canOpenOtherMenu && player.isSneaking
@@ -136,7 +144,8 @@ class WaystoneInteractListener(private val configService: ConfigService): Listen
         val baseBlock = clickedBlock.getRelative(BlockFace.DOWN)
         if (isValidWarpBase.execute(baseBlock.type.toString()) && clickedBlock.type == Material.LODESTONE) {
             player.swingMainHand()
-            event.isCancelled = true
+            event.useInteractedBlock = Event.Result.DENY
+            event.useItemInHand = Event.Result.DENY
             val clicked = event.clickedBlock ?: return
 
             // Send out a fake BlockPlaceEvent for protection plugins to hook

@@ -66,8 +66,8 @@ class WaystoneInteractListener(private val configService: ConfigService): Listen
                 return
             }
 
-            event.useInteractedBlock = Event.Result.DENY
-            event.useItemInHand = Event.Result.DENY
+            event.setUseInteractedBlock(Event.Result.DENY)
+            event.setUseItemInHand(Event.Result.DENY)
 
             // Check if warp is locked and alert if no access
             player.swingMainHand()
@@ -144,8 +144,8 @@ class WaystoneInteractListener(private val configService: ConfigService): Listen
         val baseBlock = clickedBlock.getRelative(BlockFace.DOWN)
         if (isValidWarpBase.execute(baseBlock.type.toString()) && clickedBlock.type == Material.LODESTONE) {
             player.swingMainHand()
-            event.useInteractedBlock = Event.Result.DENY
-            event.useItemInHand = Event.Result.DENY
+            event.setUseInteractedBlock(Event.Result.DENY)
+            event.setUseItemInHand(Event.Result.DENY)
             val clicked = event.clickedBlock ?: return
 
             // Send out a fake BlockPlaceEvent for protection plugins to hook
